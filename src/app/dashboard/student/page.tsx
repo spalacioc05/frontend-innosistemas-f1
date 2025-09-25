@@ -374,6 +374,15 @@ export default function StudentDashboard() {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                             </svg>
                           </button>
+                            {/* Solo el creador puede disolver */}
+                            {team.creatorId === user.id && (
+                              <button
+                                className="text-red-600 hover:text-red-800 font-medium text-sm"
+                                onClick={() => handleDissolveTeam(team.id)}
+                              >
+                                Disolver equipo
+                              </button>
+                            )}
                         </div>
                       </div>
                       
@@ -423,21 +432,21 @@ export default function StudentDashboard() {
                       key={course.id}
                       onClick={() => openCreateTeamModal(course.id)}
                       disabled={hasTeamInCourse}
-                      className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                      className={`w-full text-left p-3 rounded-lg border transition-colors font-semibold ${
                         hasTeamInCourse 
-                          ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
-                          : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                          ? 'border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed'
+                          : 'border-gray-700 hover:border-blue-700 hover:bg-blue-100 text-black'
                       }`}
                     >
                       <div className="flex items-center justify-between">
                         <div>
-                          <h3 className="font-medium">{course.name}</h3>
-                          <p className="text-sm text-gray-500">
+                          <h3 className="font-bold text-black">{course.name}</h3>
+                          <p className={`text-sm ${hasTeamInCourse ? 'text-gray-600' : 'text-blue-700 font-semibold'}`}> 
                             {hasTeamInCourse ? 'Ya tienes un equipo' : 'Crear equipo'}
                           </p>
                         </div>
                         {!hasTeamInCourse && (
-                          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-5 h-5 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                           </svg>
                         )}

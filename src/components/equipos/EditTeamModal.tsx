@@ -1,6 +1,4 @@
-'use client';
-
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 interface Student {
   id: string;
@@ -14,12 +12,12 @@ interface Team {
   name: string;
   courseId?: string;
   members: Student[];
+  projectId?: string;
   project?: string;
   progress?: number;
   status: 'forming' | 'active' | 'completed';
   createdAt: Date;
   updatedAt?: Date;
-  projectId?: string;
   frontend?: string;
 }
 
@@ -32,7 +30,14 @@ interface EditTeamModalProps {
   minTeamSize: number;
 }
 
-// Lista mock de estudiantes disponibles
+// Lista global de proyectos y estudiantes (solo una vez)
+const GLOBAL_PROJECTS: { id: string; name: string }[] = [
+  { id: 'p1', name: 'Sistema de Gestión Académica' },
+  { id: 'p2', name: 'Aplicación Móvil para Biblioteca' },
+  { id: 'p3', name: 'Portal de Estudiantes' },
+  { id: 'p4', name: 'Plataforma de Evaluación Online' },
+  { id: 'p5', name: 'Dashboard Administrativo' }
+];
 const AVAILABLE_STUDENTS: Student[] = [
   { id: '9', name: 'Sofia Hernández', email: 'sofia.hernandez@udea.edu.co', skills: ['React', 'CSS'] },
   { id: '10', name: 'Miguel Torres', email: 'miguel.torres@udea.edu.co', skills: ['Vue.js', 'JavaScript'] },
@@ -117,7 +122,6 @@ export default function EditTeamModal({
   };
 
   if (!isOpen) return null;
-
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
       <div className="relative top-8 mx-auto p-5 border max-w-2xl shadow-lg rounded-md bg-white">
@@ -136,7 +140,6 @@ export default function EditTeamModal({
             </button>
           </div>
         </div>
-
         <div className="space-y-6">
           {/* Información básica del equipo */}
           <div className="grid md:grid-cols-2 gap-4">
@@ -157,36 +160,29 @@ export default function EditTeamModal({
                 <p className="mt-1 text-sm text-red-600">{errors.name}</p>
               )}
             </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Tecnología Frontend
-              </label>
-              <select
-                value={editedTeam.frontend}
-                onChange={(e) => setEditedTeam({ ...editedTeam, frontend: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              >
-                {FRONTEND_OPTIONS.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </div>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Proyecto
             </label>
-            <input
-              type="text"
-              value={editedTeam.project || ''}
-              onChange={(e) => setEditedTeam({ ...editedTeam, project: e.target.value })}
+            <select
+              value={editedTeam.projectId || ''}
+              onChange={e => {
+                const selected = GLOBAL_PROJECTS.find(p => p.id === e.target.value);
+                setEditedTeam({
+                  ...editedTeam,
+                  projectId: selected?.id,
+                  project: selected?.name || ''
+                });
+              }}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Nombre del proyecto"
-            />
+            >
+              <option value="">Selecciona un proyecto</option>
+              {GLOBAL_PROJECTS.map(project => (
+                <option key={project.id} value={project.id}>{project.name}</option>
+              ))}
+            </select>
           </div>
 
           {/* Gestión de miembros */}
@@ -216,27 +212,16 @@ export default function EditTeamModal({
               {editedTeam.members.map((member) => (
                 <div key={member.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      <span className="text-sm font-medium text-blue-600">
+                    <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                      <span className="text-sm font-medium text-gray-600">
                         {member.name.charAt(0)}
                       </span>
                     </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">{member.name}</p>
-                      <p className="text-xs text-gray-500">{member.email}</p>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {member.skills.map((skill, index) => (
-                          <span 
-                            key={index}
-                            className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800"
-                          >
-                            {skill}
-                          </span>
-                        ))}
+                      <div>
+                        <p className="text-base font-semibold text-black">{member.name}</p>
+                        <p className="text-xs text-gray-700">{member.email}</p>
                       </div>
-                    </div>
                   </div>
-                  
                   {editedTeam.members.length > minTeamSize && (
                     <button
                       onClick={() => handleRemoveMember(member.id)}
@@ -296,16 +281,6 @@ export default function EditTeamModal({
                         <div className="flex-1">
                           <p className="text-sm font-medium text-gray-900">{student.name}</p>
                           <p className="text-xs text-gray-500">{student.email}</p>
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {student.skills.map((skill, index) => (
-                              <span 
-                                key={index}
-                                className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800"
-                              >
-                                {skill}
-                              </span>
-                            ))}
-                          </div>
                         </div>
                       </div>
                     </div>

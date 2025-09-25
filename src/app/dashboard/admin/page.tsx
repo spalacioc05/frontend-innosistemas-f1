@@ -7,6 +7,11 @@ import NavBar from '@/components/layout/NavBar';
 import { SOFTWARE_ENGINEERING_COURSES, Team, Student } from '@/types';
 
 export default function AdminDashboard() {
+  // Placeholder para disolver equipo
+  const handleDissolveTeam = (teamId: string) => {
+    // Aquí va la lógica para disolver el equipo
+    alert(`Disolver equipo con ID: ${teamId}`);
+  } 
   const { user } = useAuth();
 
   // Mock data para admin
@@ -279,6 +284,15 @@ export default function AdminDashboard() {
                         <button className="text-green-600 hover:text-green-800 font-medium text-sm">
                           Resolver
                         </button>
+                        {/* Solo el admin puede disolver */}
+                        {user?.role === 'admin' && (
+                          <button
+                            className="text-red-600 hover:text-red-800 font-medium text-sm"
+                            onClick={() => handleDissolveTeam(alert.id)}
+                          >
+                            Disolver equipo
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
