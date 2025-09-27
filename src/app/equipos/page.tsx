@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import NavBar from '@/components/layout/NavBar';
 import { Team, Student, SOFTWARE_ENGINEERING_COURSES } from '@/types';
-import { TeamsService, TeamResponse, ProjectsService, UsersService, Project, User } from '@/services/teams';
+import { TeamsService, TeamResponse, ProjectsService, UsersService, Project, User, UpdateTeamRequest } from '@/services/teams';
 
 // Función para convertir TeamResponse a Team
 // Nota: teamResponse.projectId y teamResponse.projectName se reciben del backend pero NO se muestran en la UI
@@ -12,7 +12,7 @@ const mapTeamResponseToTeam = (teamResponse: TeamResponse): Team => ({
   name: teamResponse.nameTeam,
   courseId: teamResponse.courseId.toString(),
   creatorId: teamResponse.students[0]?.email || '',
-  // El projectId se recibe en teamResponse.projectId pero intencionalmente NO se usa en la UI
+  projectId: teamResponse.projectId.toString(), // Incluir projectId para edición
   members: teamResponse.students.map((student, idx) => ({
     id: idx.toString(),
     name: student.nameUser,
@@ -102,18 +102,37 @@ export default function EquiposPage() {
       const selectedProject = projects.find(p => p.id.toString() === formData.projectId);
       const selectedUsersList = users.filter(user => formData.selectedUsers.includes(user.email));
       
-      await TeamsService.createTeam({
-        nameTeam: formData.nameTeam,
-        courseId: 1, // Valor por defecto
-        projectId: parseInt(formData.projectId),
-        projectName: selectedProject?.name || 'Proyecto',
-        students: selectedUsersList.map(user => ({
-          email: user.email,
-          nameUser: user.nameUser
-        }))
-      });
+      if (editingTeam) {
+        // Actualizar equipo existente
+        const updateData: UpdateTeamRequest = {
+          idTeam: parseInt(editingTeam.id),
+          nameTeam: formData.nameTeam,
+          courseId: 1, // Valor por defecto
+          projectId: parseInt(formData.projectId),
+          projectName: selectedProject?.name || 'Proyecto',
+          students: selectedUsersList.map(user => ({
+            email: user.email,
+            nameUser: user.nameUser
+          }))
+        };
+        
+        await TeamsService.updateTeam(updateData);
+      } else {
+        // Crear nuevo equipo
+        await TeamsService.createTeam({
+          nameTeam: formData.nameTeam,
+          courseId: 1, // Valor por defecto
+          projectId: parseInt(formData.projectId),
+          projectName: selectedProject?.name || 'Proyecto',
+          students: selectedUsersList.map(user => ({
+            email: user.email,
+            nameUser: user.nameUser
+          }))
+        });
+      }
       
       setShowCreateModal(false);
+      setEditingTeam(null);
       setFormData({ 
         nameTeam: '', 
         projectId: '',
@@ -121,8 +140,8 @@ export default function EquiposPage() {
       });
       loadAllTeams(); // Recargar la lista
     } catch (err) {
-      setError('Error al crear el equipo. Intenta nuevamente.');
-      console.error('Error creating team:', err);
+      setError(editingTeam ? 'Error al actualizar el equipo. Intenta nuevamente.' : 'Error al crear el equipo. Intenta nuevamente.');
+      console.error(editingTeam ? 'Error updating team:' : 'Error creating team:', err);
     } finally {
       setLoading(false);
     }
@@ -149,7 +168,7 @@ export default function EquiposPage() {
     setEditingTeam(team);
     setFormData({
       nameTeam: team.name,
-      projectId: '', // Se podría obtener del team si está disponible
+      projectId: team.projectId || '', // Usar el projectId del equipo
       selectedUsers: team.members.map(member => member.email)
     });
     setShowCreateModal(true);

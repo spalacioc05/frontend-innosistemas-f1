@@ -33,6 +33,18 @@ export interface CreateTeamRequest {
   }[];
 }
 
+export interface UpdateTeamRequest {
+  idTeam: number;
+  nameTeam: string;
+  projectId: number;
+  projectName: string;
+  courseId: number;
+  students: {
+    email: string;
+    nameUser: string;
+  }[];
+}
+
 export class TeamsService {
   /**
    * Obtiene los equipos de un usuario por su email
@@ -123,6 +135,29 @@ export class TeamsService {
       }
     } catch (error) {
       console.error('Error deleting team:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Actualiza un equipo existente
+   */
+  static async updateTeam(updateData: UpdateTeamRequest): Promise<void> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/team/updateTeam`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error ${response.status}: ${errorText}`);
+      }
+    } catch (error) {
+      console.error('Error updating team:', error);
       throw error;
     }
   }
