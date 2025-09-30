@@ -163,13 +163,13 @@ export default function TeamActionsModal({
                     Confirmar Abandono
                   </h3>
                   <div className="mt-2 text-sm text-orange-700">
-                    <p>Estás a punto de abandonar el equipo "{team.name}".</p>
+                    <p>Estás a punto de abandonar el equipo &quot;{team.name}&quot;.</p>
                     <ul className="mt-2 list-disc list-inside">
                       <li>Los demás miembros recibirán una notificación</li>
                       <li>Perderás acceso al proyecto del equipo</li>
                       {wouldBeIncomplete && (
                         <li className="text-orange-800 font-medium">
-                          El equipo quedará marcado como "Incompleto"
+                          El equipo quedará marcado como &quot;Incompleto&quot;
                         </li>
                       )}
                     </ul>
@@ -180,7 +180,7 @@ export default function TeamActionsModal({
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Para confirmar, escribe "ABANDONAR":
+                Para confirmar, escribe &quot;ABANDONAR&quot;:
               </label>
               <input
                 type="text"
@@ -222,7 +222,7 @@ export default function TeamActionsModal({
                     Confirmar Disolución
                   </h3>
                   <div className="mt-2 text-sm text-red-700">
-                    <p>Estás a punto de disolver completamente el equipo "{team.name}".</p>
+                    <p>Estás a punto de disolver completamente el equipo &quot;{team.name}&quot;.</p>
                     <ul className="mt-2 list-disc list-inside">
                       <li>Todos los miembros recibirán una notificación</li>
                       <li>El equipo será eliminado permanentemente</li>
@@ -236,7 +236,7 @@ export default function TeamActionsModal({
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Para confirmar, escribe "DISOLVER":
+                Para confirmar, escribe &quot;DISOLVER&quot;:
               </label>
               <input
                 type="text"

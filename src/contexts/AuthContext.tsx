@@ -36,7 +36,7 @@ const MOCK_USERS: User[] = [
     courseIds: ['is1', 'is2', 'is3'],
     skills: ['React', 'Node.js', 'MongoDB', 'TypeScript'],
     currentTeams: { is1: 'team1' }
-  } as any,
+  } as User,
   {
     id: 'student2',
     name: 'María García',
@@ -49,7 +49,7 @@ const MOCK_USERS: User[] = [
     courseIds: ['is1', 'is2', 'is4'],
     skills: ['Python', 'Django', 'PostgreSQL'],
     currentTeams: {}
-  } as any,
+  } as User,
   {
     id: 'student3',
     name: 'Carlos López',
@@ -62,7 +62,7 @@ const MOCK_USERS: User[] = [
     courseIds: ['is1', 'is3', 'is5'],
     skills: ['Java', 'Spring', 'MySQL'],
     currentTeams: {}
-  } as any,
+  } as User,
   {
     id: 'student4',
     name: 'Ana Rodríguez',
@@ -75,7 +75,7 @@ const MOCK_USERS: User[] = [
     courseIds: ['is1', 'is4', 'is6'],
     skills: ['Vue.js', 'PHP', 'PostgreSQL'],
     currentTeams: {}
-  } as any
+  } as User
 ];
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {

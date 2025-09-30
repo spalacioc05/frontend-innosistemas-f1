@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { TeamsService, TeamResponse, CreateTeamRequest } from '@/services/teams';
 
@@ -43,16 +43,7 @@ export default function ProyectosPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Cargar equipos cuando se selecciona un proyecto
-  useEffect(() => {
-    if (selectedProjectId) {
-      loadTeamsForProject();
-    } else {
-      setTeams([]);
-    }
-  }, [selectedProjectId]);
-
-  const loadTeamsForProject = async () => {
+  const loadTeamsForProject = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -77,7 +68,16 @@ export default function ProyectosPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedProjectId]);
+
+  // Cargar equipos cuando se selecciona un proyecto
+  useEffect(() => {
+    if (selectedProjectId) {
+      loadTeamsForProject();
+    } else {
+      setTeams([]);
+    }
+  }, [selectedProjectId, loadTeamsForProject]);
 
   const handleCreateTeam = async () => {
     if (!newTeamName.trim() || !selectedProjectId || selectedMembers.length < 2) {
@@ -114,8 +114,9 @@ export default function ProyectosPage() {
       setSelectedMembers([]);
       // Recargar equipos
       await loadTeamsForProject();
-    } catch (err: any) {
-      alert(`Error al crear el equipo: ${err.message}`);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
+      alert(`Error al crear el equipo: ${errorMessage}`);
       console.error('Error creating team:', err);
     } finally {
       setLoading(false);

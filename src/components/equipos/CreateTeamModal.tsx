@@ -105,11 +105,6 @@ export default function CreateTeamModal({
     }
   }, [isOpen, courseId, user?.id]);
 
-  // Validar el equipo cuando cambie la selección
-  useEffect(() => {
-    validateTeam();
-  }, [selectedMembers, teamName]);
-
   const validateTeam = () => {
     const errors: TeamValidationError[] = [];
     
@@ -154,14 +149,27 @@ export default function CreateTeamModal({
       errors,
       warnings: []
     });
+    setValidation({
+      isValid: errors.length === 0,
+      errors,
+      warnings: []
+    });
   };
+
+  // Validar el equipo cuando cambie la selección
+  useEffect(() => {
+    validateTeam();
+  }, [selectedMembers, teamName, validateTeam]);
 
   const handleToggleMember = (student: Student) => {
     setSelectedMembers(prev => {
       const isSelected = prev.find(m => m.id === student.id);
+      
       if (isSelected) {
+        // Remover del equipo
         return prev.filter(m => m.id !== student.id);
       } else {
+        // Agregar al equipo si no se supera el máximo
         if (prev.length + 1 >= maxTeamSize) { // +1 por el creador
           return prev; // No agregar si ya se alcanzó el máximo
         }
@@ -433,7 +441,7 @@ export default function CreateTeamModal({
               <h3 className="text-sm font-medium text-blue-800">Información:</h3>
               <ul className="mt-1 text-sm text-blue-700 list-disc list-inside">
                 <li>Los miembros seleccionados recibirán una notificación.</li>
-                <li>El equipo estará en estado "En Formación" hasta la confirmación final.</li>
+                <li>El equipo estará en estado &quot;En Formación&quot; hasta la confirmación final.</li>
                 <li>Podrás modificar el equipo antes de la confirmación del curso.</li>
               </ul>
             </div>
