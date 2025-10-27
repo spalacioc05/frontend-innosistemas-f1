@@ -34,8 +34,8 @@ export default function LoginForm() {
 
     if (!formData.email) {
       newErrors.email = 'El correo electrónico es requerido';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'El correo electrónico no es válido';
+    } else if (!/^[^\s@]+@udea\.edu\.co$/i.test(formData.email)) {
+      newErrors.email = 'Email no válido';
     }
 
     if (!formData.password) {
@@ -63,7 +63,10 @@ export default function LoginForm() {
       
     } catch (error) {
       console.error('Error en el login:', error);
-      setErrors({ general: 'Error al iniciar sesión. Verifica tus credenciales.' });
+      const message = (error as any)?.code === 'INVALID_EMAIL'
+        ? 'Email no válido'
+        : 'Credenciales incorrectas — por favor verifique';
+      setErrors({ general: message });
     }
   };
 

@@ -2,14 +2,20 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { SOFTWARE_ENGINEERING_COURSES } from '@/types';
+import { AuthService } from '@/services/auth';
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
+    roleInProject: '',
+    courseIds: [] as string[],
     password: '',
     confirmPassword: ''
   });
   const [errors, setErrors] = useState<{[key: string]: string}>({});
+  const [success, setSuccess] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -30,10 +36,22 @@ export default function RegisterForm() {
   const validateForm = () => {
     const newErrors: {[key: string]: string} = {};
 
+    if (!formData.name.trim()) {
+      newErrors.name = 'El nombre es obligatorio';
+    }
+
     if (!formData.email) {
       newErrors.email = 'El correo electrónico es requerido';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'El correo electrónico no es válido';
+    } else if (!/^[^\s@]+@udea\.edu\.co$/i.test(formData.email)) {
+      newErrors.email = 'Email no válido';
+    }
+
+    if (!formData.roleInProject.trim()) {
+      newErrors.roleInProject = 'El rol en los proyectos es obligatorio';
+    }
+
+    if (!formData.courseIds.length) {
+      newErrors.courseIds = 'Debes seleccionar al menos un curso';
     }
 
     if (!formData.password) {
@@ -60,23 +78,31 @@ export default function RegisterForm() {
     }
 
     setIsLoading(true);
+    setSuccess('');
 
     try {
-      // Aquí se implementaría la lógica de registro
-      console.log('Datos de registro:', { 
-        email: formData.email, 
-        password: formData.password 
+      await AuthService.register({
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        password: formData.password,
+        roleInProject: formData.roleInProject.trim(),
+        courseIds: formData.courseIds
       });
+
+      setSuccess('Registro exitoso');
+      // Opcionalmente limpiar el formulario
+      setFormData({ name: '', email: '', roleInProject: '', courseIds: [], password: '', confirmPassword: '' });
       
-      // Simular una llamada a API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Redireccionar después del registro exitoso
-      // router.push('/auth/login');
-      
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error en el registro:', error);
-      setErrors({ general: 'Error al crear la cuenta. Inténtalo de nuevo.' });
+      // Si el backend devuelve 409 para usuario existente
+      const message =
+        (String((error as any)?.message).includes('409') || /exist/i.test(String(error)))
+        ? 'El usuario ya existe'
+        : (error as any)?.code === 'INVALID_EMAIL'
+        ? 'Email no válido'
+        : 'Error al crear la cuenta. Inténtalo de nuevo.';
+      setErrors({ general: message });
     } finally {
       setIsLoading(false);
     }
@@ -106,8 +132,33 @@ export default function RegisterForm() {
               {errors.general}
             </div>
           )}
+          {success && (
+            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+              {success}
+            </div>
+          )}
           
           <div className="space-y-4">
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                Nombre completo
+              </label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                required
+                className={`mt-1 appearance-none relative block w-full px-3 py-2 border ${
+                  errors.name ? 'border-red-300' : 'border-gray-300'
+                } placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
+                placeholder="Tu nombre"
+                value={formData.name}
+                onChange={handleChange}
+              />
+              {errors.name && (
+                <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+              )}
+            </div>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Correo Electrónico
@@ -127,6 +178,62 @@ export default function RegisterForm() {
               />
               {errors.email && (
                 <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="roleInProject" className="block text-sm font-medium text-gray-700">
+                Rol en los proyectos
+              </label>
+              <input
+                id="roleInProject"
+                name="roleInProject"
+                type="text"
+                required
+                className={`mt-1 appearance-none relative block w-full px-3 py-2 border ${
+                  errors.roleInProject ? 'border-red-300' : 'border-gray-300'
+                } placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
+                placeholder="Ej: Desarrollador, QA, Líder"
+                value={formData.roleInProject}
+                onChange={handleChange}
+              />
+              {errors.roleInProject && (
+                <p className="mt-1 text-sm text-red-600">{errors.roleInProject}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Selecciona tus cursos
+              </label>
+              <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {SOFTWARE_ENGINEERING_COURSES.map((course) => {
+                  const checked = formData.courseIds.includes(course.id);
+                  return (
+                    <label key={course.id} className="inline-flex items-center space-x-2 text-sm text-gray-700">
+                      <input
+                        type="checkbox"
+                        className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                        checked={checked}
+                        onChange={(e) => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            courseIds: e.target.checked
+                              ? [...prev.courseIds, course.id]
+                              : prev.courseIds.filter((id) => id !== course.id)
+                          }));
+                          if (errors.courseIds) {
+                            setErrors((prev) => ({ ...prev, courseIds: '' }));
+                          }
+                        }}
+                      />
+                      <span>{course.name}</span>
+                    </label>
+                  );
+                })}
+              </div>
+              {errors.courseIds && (
+                <p className="mt-1 text-sm text-red-600">{errors.courseIds}</p>
               )}
             </div>
             

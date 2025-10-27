@@ -114,6 +114,27 @@ export interface AuthContext {
   isLoading: boolean;
 }
 
+// Autenticación
+export type Role = 'student' | 'admin' | 'professor';
+
+export interface LoginPayload {
+  email: string;
+  password: string;
+}
+
+export interface AuthResponse {
+  token: string;
+  user: User;
+}
+
+export interface RegisterPayload {
+  name: string;
+  email: string;
+  password: string;
+  roleInProject: string; // Preferencia del usuario en los proyectos (p.ej., "Desarrollador", "QA")
+  courseIds: string[];   // Cursos seleccionados en los que estará matriculado
+}
+
 // Cursos de Ingeniería de Software
 export const SOFTWARE_ENGINEERING_COURSES: Course[] = [
   {

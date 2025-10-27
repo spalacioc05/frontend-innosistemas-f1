@@ -1,13 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useState } from 'react';
 
 export default function NavBar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
+  const router = useRouter();
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   const isActive = (path: string) => {
@@ -31,7 +32,8 @@ export default function NavBar() {
     if (user.role === 'admin') {
       baseItems.push(
         { href: '/dashboard/admin', label: 'Dashboard Admin' },
-        { href: '/cursos', label: 'Gestión de Cursos' },
+        { href: '/admin/cursos', label: 'Gestión de Cursos' },
+        { href: '/admin/proyectos', label: 'Gestión de Proyectos' },
         { href: '/admin/usuarios', label: 'Gestión de Usuarios' },
         { href: '/admin/reportes', label: 'Reportes y Estadísticas' }
       );
@@ -54,9 +56,10 @@ export default function NavBar() {
 
   const navItems = getNavItems();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     setShowUserMenu(false);
+    router.push('/auth/login');
   };
 
   return (

@@ -13,8 +13,20 @@ export class ApiClient {
   ): Promise<T> {
     const url = `${API_CONFIG.BASE_URL}${endpoint}`;
     
+    // Adjuntar Authorization si existe cookie 'auth_token' en entorno cliente
+    let authHeaders: Record<string, string> = {};
+    try {
+      if (typeof document !== 'undefined') {
+        const token = document.cookie
+          .split('; ')
+          .find((v) => v.startsWith('auth_token='))
+          ?.split('=')[1];
+        if (token) authHeaders['Authorization'] = `Bearer ${decodeURIComponent(token)}`;
+      }
+    } catch {}
+
     const config: RequestInit = {
-      headers: API_CONFIG.HEADERS,
+      headers: { ...API_CONFIG.HEADERS, ...(options.headers as any), ...authHeaders },
       ...options,
     };
 

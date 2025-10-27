@@ -1,240 +1,306 @@
-# Sistema de Gestión de Equipos - Universidad de Antioquia
+# InnoSistemas — Gestión de Equipos (Frontend)
 
-Una aplicación web moderna para la gestión de equipos de trabajo en cursos de Ingeniería de Software, construida con Next.js, React y TypeScript.
+Plataforma web para la formación y gestión de equipos de desarrollo en los siete cursos del área de Ingeniería de Software de la Universidad de Antioquia.
 
-## Características
+![Next.js](https://img.shields.io/badge/Next.js-15.5.3-black?logo=next.js)
+![React](https://img.shields.io/badge/React-19.1.0-61DAFB?logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-4.x-38B2AC?logo=tailwindcss&logoColor=white)
+![ESLint](https://img.shields.io/badge/ESLint-9.x-4B32C3?logo=eslint&logoColor=white)
+![Node](https://img.shields.io/badge/Node.js-20%2B-339933?logo=node.js&logoColor=white)
+![Turbopack](https://img.shields.io/badge/Turbopack-Enabled-000000?logo=vercel&logoColor=white)
 
-- 🔐 **Sistema de Autenticación por Roles**: Administradores, Profesores y Estudiantes
-- 👥 **Gestión de Equipos**: Creación, edición, y administración de equipos
-- 📚 **Gestión de Cursos**: Múltiples cursos de Ingeniería de Software
-- 🔔 **Sistema de Notificaciones**: Alertas en tiempo real para actividades del equipo
-- 📱 **Diseño Responsivo**: Interfaz adaptable a diferentes dispositivos
-- 🎨 **UI Moderna**: Diseño limpio con Tailwind CSS
-- ⚡ **Rendimiento Optimizado**: Construido con Next.js 15
+---
 
-## Tecnologías Utilizadas
+## 🧭 Contexto del Proyecto
 
-- [Next.js 15](https://nextjs.org/) - Framework de React
-- [TypeScript](https://www.typescriptlang.org/) - Tipado estático
-- [Tailwind CSS](https://tailwindcss.com/) - Framework de CSS
-- [React Context](https://reactjs.org/docs/context.html) - Gestión de estado global
-- [ESLint](https://eslint.org/) - Linter de código
+InnoSistemas es una plataforma de integración y desarrollo que busca llevar a la práctica los conocimientos adquiridos por los estudiantes a lo largo de siete cursos del área de Ingeniería de Software. A través de la plataforma, los estudiantes conforman equipos multidisciplinarios, desarrollan MVPs y trabajan con metodologías ágiles y colaborativas, simulando escenarios reales del entorno laboral.
 
-## Perfiles de Usuario
+Objetivo general: facilitar la interacción entre estudiantes, el monitoreo del progreso y la entrega de retroalimentación de manera eficiente y estructurada.
 
-### 👨‍💼 Administrador
-- Dashboard completo con estadísticas del sistema
-- Gestión de usuarios (estudiantes y profesores)
-- Supervisión de todos los equipos y cursos
-- Resolución de conflictos y equipos problemáticos
-- Reportes y analytics del sistema
+Este repositorio corresponde al Frontend de la Feature 1: Gestión de Equipos de Desarrollo.
 
-### 👨‍🎓 Estudiante
-- Dashboard personalizado con sus equipos
-- Creación de equipos con validaciones de negocio
-- Invitación de miembros del mismo curso
-- Edición de equipos (nombre y miembros)
-- Abandono de equipos o disolución (si es creador)
-- Sistema de notificaciones
+- Autenticación y autorización con credenciales institucionales (@udea.edu.co)
+- Creación y gestión de equipos (2 a 3 integrantes) por curso
+- Asociación de estudiantes a equipos y validaciones de negocio
+- Notificaciones in-app para cambios relevantes
+- Dashboards por rol (Administrador, Estudiante)
+- Cumplimiento progresivo de accesibilidad y buenas prácticas de seguridad
 
-## Funcionalidades Implementadas
+---
 
-### 🔐 Autenticación y Autorización
-- [x] Sistema de login diferenciado por roles
-- [x] Contexto de autenticación con React Context
-- [x] Redirección automática según el rol del usuario
-- [x] Protección de rutas por rol
+## 🧩 Alcance de esta Feature (F1) — Gestión de Equipos
 
-### 👥 Gestión de Equipos (Estudiantes)
-- [x] **Crear Equipo**: Interface para crear equipos con selección de miembros
-- [x] **Validaciones de Negocio**:
-  - Mínimo 2 y máximo 3 integrantes por equipo
-  - Solo estudiantes del mismo curso
-  - Prevención de membresía duplicada
-  - Validación de disponibilidad de estudiantes
-- [x] **Editar Equipo**: Modificar nombre y agregar/quitar miembros
-- [x] **Abandonar Equipo**: Cualquier miembro puede salir del equipo
-- [x] **Disolver Equipo**: El creador puede eliminar completamente el equipo
-- [x] **Sistema de Notificaciones**: Alertas para invitaciones, cambios y eventos
+Permite crear, gestionar y asignar equipos de trabajo conformados por estudiantes de los siete cursos de Ingeniería de Software. Los equipos se organizan según necesidades del proyecto y las habilidades de cada miembro.
 
-### 🏫 Gestión de Cursos
-- [x] Listado de cursos de Ingeniería de Software
-- [x] Vista de equipos por curso
-- [x] Estadísticas de equipos por curso
-- [x] Navegación breadcrumb
+- 🔐 Autenticación y autorización: acceso con credenciales institucionales; control por rol (admin/estudiante)
+- 👥 Creación y gestión de equipos: equipos de 2 a 3 estudiantes del mismo curso; edición previa a confirmación
+- ➕ Asociación de estudiantes: unirse a equipos existentes según preferencia/rol y reglas del curso
+- 🔔 Notificaciones: avisos automáticos en la app ante asignaciones/cambios relevantes
+- 📊 Reporte/Estado: dashboards que muestran estado de formación y progreso del equipo
+- ♿ Accesibilidad: diseño y flujos alineados a buenas prácticas (en progreso)
+- 🔒 Seguridad: disponibilidad, confidencialidad e integridad de la información (en progreso)
 
-### 📊 Dashboard Diferenciado
-- [x] **Dashboard de Administrador**: 
-  - Estadísticas globales del sistema
-  - Alertas de equipos problemáticos
-  - Actividad reciente del sistema
-  - Accesos rápidos a gestión
-- [x] **Dashboard de Estudiante**:
-  - Estadísticas personales
-  - Sus equipos activos
-  - Notificaciones personalizadas
-  - Creación rápida de equipos por curso
+---
 
-### 🔔 Sistema de Notificaciones
-- [x] Notificaciones por invitación a equipo
-- [x] Alertas por abandono de miembros
-- [x] Notificaciones por disolución de equipos
-- [x] Marcadores de equipos incompletos
-- [x] Indicadores visuales de notificaciones no leídas
+## 🏁 Sprints y HU implementadas
 
-### 🎨 UI/UX
-- [x] Navegación adaptativa según el rol
-- [x] Modales interactivos para gestión de equipos
-- [x] Confirmaciones de acciones críticas
-- [x] Estados de carga y validación en tiempo real
-- [x] Diseño responsivo completo
+Este trabajo se planificó en 3 sprints. En este repositorio (Frontend) ya están implementadas las HU de los Sprints 1 y 2.
 
-## Reglas de Negocio Implementadas
+### ✅ Sprint 1 — Equipos de Desarrollo
 
-### Creación de Equipos
-1. **Tamaño del equipo**: Entre 2 y 3 integrantes (incluyendo al creador)
-2. **Curso único**: Solo estudiantes del mismo curso pueden formar equipo
-3. **Membresía única**: Un estudiante no puede estar en múltiples equipos del mismo curso
-4. **Validación de disponibilidad**: Verificación de que los invitados no están en otros equipos
+- HU-01 Crear equipo
+  - Formulario para crear equipos con nombre y selección de miembros del mismo curso
+  - Validaciones: mínimo 2 y máximo 3 integrantes; sin duplicidad por curso
+  - Mensajes explicativos en errores de validación
+  - Notificación in‑app a los miembros al crear el equipo
+  - El equipo aparece en el listado del curso tras la creación
 
-### Modificación de Equipos
-1. **Solo antes de confirmación final**: Los equipos pueden editarse mientras están en estado "En Formación"
-2. **Validaciones al agregar**: Mismo curso, máximo 3 miembros, sin duplicidades
-3. **Validaciones al quitar**: Mínimo 2 miembros después de la remoción
-4. **Notificaciones**: Todos los cambios generan notificaciones a los afectados
+- HU-03 Editar equipo
+  - El creador puede editar nombre y miembros antes de la confirmación final
+  - Validaciones al agregar: mismo curso, no duplicidad, máximo 3
+  - Notificación al miembro removido
+  - Bloqueo si quedan menos de 2 integrantes (mensaje explicativo)
 
-### Abandono y Disolución
-1. **Abandono**: Cualquier miembro puede abandonar el equipo
-2. **Equipo incompleto**: Si queda con menos de 2 miembros, se marca como "Incompleto"
-3. **Disolución**: Solo el creador puede disolver completamente el equipo
-4. **Notificaciones**: Todos los miembros son notificados de estos eventos
+- HU-02 Abandonar / Disolver equipo
+  - Cualquier miembro puede abandonar el equipo (notificaciones al resto)
+  - Si quedan <2 miembros: equipo marcado “incompleto” y notificación al admin
+  - El creador puede disolver el equipo (se elimina del listado y notifica a todos)
 
-## Páginas Disponibles
+### ✅ Sprint 2 — Acceso, Cursos y Proyectos
 
-### Públicas
-- `/` - Página principal
-- `/auth/login` - Inicio de sesión
-- `/auth/register` - Registro de usuarios
+- HU-06 Inicio de sesión
+  - Login con email institucional @udea.edu.co y asignación de rol (estudiante/admin)
+  - Redirección al dashboard según rol tras autenticación
+  - Mensaje de error claro ante credenciales inválidas: “Credenciales incorrectas — por favor verifique”
+  - Usuario inicial con rol de administrador (mock para dev, integración lista para backend)
 
-### Protegidas
-- `/dashboard` - Redirección automática según rol
-- `/dashboard/admin` - Panel de administración
-- `/dashboard/student` - Panel de estudiante
-- `/cursos` - Listado de cursos
-- `/cursos/[id]` - Vista específica del curso
-- `/cursos/[id]/equipos` - Gestión de equipos del curso
+- HU-07 Cierre de sesión
+  - Cierre de sesión desde el menú
+  - Invalida sesión y redirige al login
+  - Rutas internas protegidas: tras logout, vuelven a login al intentar acceder
+  - Limpieza de tokens/cookies en cliente y (opcional) servidor
 
-## Usuarios de Demo
+- HU-04 Registro de usuario
+  - Formulario con campos: nombre, email, rol en proyectos y contraseña + selección de cursos
+  - Mensajes: “Registro exitoso”, “Email no válido”, “El usuario ya existe”
+  - Registro por defecto con rol estudiante
 
-### Administrador
-- **Email**: admin@udea.edu.co
-- **Contraseña**: cualquier valor (para demo)
+- HU-08 Crear curso (administrador)
+  - Crear curso con validación de requerido y unicidad por nombre
+  - Mensajes: “Curso creado exitosamente” / “Ya existe un curso con este nombre”
 
-### Estudiantes
-- **Email**: juan.perez@udea.edu.co
-- **Email**: maria.garcia@udea.edu.co
-- **Email**: carlos.lopez@udea.edu.co
-- **Contraseña**: cualquier valor (para demo)
+- HU-09 Crear proyecto (administrador)
+  - Crear proyecto con nombre, descripción y curso
+  - Validación de unicidad por curso antes de guardar
+  - Mensaje: “Proyecto creado exitosamente”
 
-## Comenzar
+> Nota: La integración con backend está preparada con servicios tipados (GET/POST). Ajustar endpoints si el backend define rutas finales diferentes.
 
-1. Instala las dependencias:
+### ⏭️ Sprint 3 (planificado)
+
+- Dashboard de profesor y asignaciones de proyectos
+- Métricas avanzadas y reportes
+- Accesibilidad WCAG (enfoque AA): navegabilidad por teclado, contraste, ARIA
+- Endurecimiento de seguridad (OWASP Top 10) y auditorías
+
+---
+
+## 🛠️ Stack Tecnológico
+
+- Next.js 15 (App Router) — SSR/SSG, Middleware y Turbopack
+- React 19 — UI declarativa y componentes
+- TypeScript — Tipado estático en componentes, contextos y servicios
+- Tailwind CSS 4 — Estilos utilitarios y diseño responsivo
+- ESLint 9 — Estándares de código y buenas prácticas
+
+---
+
+## 🧱 Arquitectura Frontend (resumen)
+
+- Autenticación y estado
+  - `src/contexts/AuthContext.tsx`: contexto de autenticación (login, register, logout, rol)
+  - Cookies: `auth_token` y `auth_role` para middleware y headers
+
+- Cliente API centralizado
+  - `src/config/api.ts`: base URL + inyección automática de Authorization desde cookie
+
+- Servicios tipados
+  - `src/services/auth.ts`: login, register, logout
+  - `src/services/courses.ts`: createCourse, existsByName, list
+  - `src/services/projects.ts`: createProject, existsByNameInCourse, listByCourse
+
+- Protección de rutas y redirecciones
+  - `middleware.ts`:
+    - Requiere token para rutas internas
+    - Guards por rol en `/admin` y dashboards por rol
+    - Si el usuario autenticado visita `/auth/login` o `/auth/register`, se redirige a su dashboard
+    - Si el usuario autenticado visita `/`, se redirige a su dashboard
+
+- UI y páginas principales
+  - Auth: `src/components/auth/{LoginForm,RegisterForm}.tsx`
+  - Admin: `src/app/admin/{cursos,proyectos}/page.tsx`
+  - Cursos/equipos: `src/app/cursos/[id]/equipos/page.tsx`
+  - Layout/Nav: `src/components/layout/NavBar.tsx`, `src/app/layout.tsx`
+
+---
+
+## 🧩 Rutas Clave
+
+Públicas
+
+- `/` — Página principal (si autenticado, redirige al dashboard del rol)
+- `/auth/login` — Inicio de sesión (redirige si ya estás autenticado)
+- `/auth/register` — Registro de usuarios (redirige si ya estás autenticado)
+
+Protegidas
+
+- `/dashboard` — Redirige al dashboard por rol
+- `/dashboard/admin` — Panel de administración
+- `/dashboard/student` — Panel de estudiante
+- `/cursos` — Listado de cursos
+- `/cursos/[id]` — Vista específica de curso
+- `/cursos/[id]/equipos` — Gestión de equipos del curso
+- `/admin/cursos` — Creación de cursos (admin)
+- `/admin/proyectos` — Creación de proyectos (admin)
+
+---
+
+## 🔐 Seguridad y ♿ Accesibilidad
+
+- Seguridad
+  - Token en cookie (`auth_token`) y rol (`auth_role`)
+  - Middleware con guards por rol y protección de rutas
+  - Logout limpia estado local y cookies; endpoint de logout preparado
+  - Cabeceras Authorization inyectadas automáticamente en el cliente API
+
+- Accesibilidad (en progreso continuo)
+  - Diseño responsivo con Tailwind
+  - Contenido y mensajes claros en formularios y validaciones
+  - Próximos pasos: foco visible, navegación por teclado, ARIA y contraste AA
+
+---
+
+## 🔌 Integración con Backend
+
+- Base URL configurable: `NEXT_PUBLIC_API_URL` (por defecto `http://localhost:8080/api`)
+- Ajustar rutas/contratos en `src/services/*` si el backend define endpoints finales diferentes
+- Respuestas y payloads tipados en `src/types`
+
+---
+
+## ▶️ Cómo ejecutar (dev)
+
+Requisitos
+
+- Node.js 20 o superior
+- npm
+
+Instalación
+
 ```bash
 npm install
 ```
 
-2. Ejecuta el servidor de desarrollo:
+Desarrollo (Turbopack, puerto 3004)
+
 ```bash
 npm run dev
 ```
 
-3. Abre [http://localhost:3000](http://localhost:3000) en tu navegador
+Abre: http://localhost:3004
 
-4. Usa las credenciales de demo para probar las diferentes funcionalidades
+Build y producción
 
-## Scripts Disponibles
+```bash
+npm run build
+npm start
+```
 
-- `npm run dev` - Inicia el servidor de desarrollo
-- `npm run build` - Construye la aplicación para producción
-- `npm start` - Inicia el servidor de producción
-- `npm run lint` - Ejecuta el linter de código
+Lint
 
-## Estructura del Proyecto
+```bash
+npm run lint
+```
+
+Consejo VS Code: puedes usar la tarea “Start Development Server” para iniciar el servidor de desarrollo.
+
+---
+
+## ⚙️ Variables de entorno
+
+Puedes crear un archivo `.env.local` en la raíz del proyecto:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8080/api
+```
+
+---
+
+## 🗂️ Estructura del Proyecto
 
 ```
 src/
 ├── app/
 │   ├── auth/
-│   │   ├── login/page.tsx           # Página de login
-│   │   └── register/page.tsx        # Página de registro
+│   │   ├── login/page.tsx
+│   │   └── register/page.tsx
 │   ├── dashboard/
-│   │   ├── page.tsx                 # Dashboard principal (redirección)
-│   │   ├── admin/page.tsx           # Dashboard de administrador
-│   │   └── student/page.tsx         # Dashboard de estudiante
+│   │   ├── page.tsx
+│   │   ├── admin/page.tsx
+│   │   └── student/page.tsx
 │   ├── cursos/
-│   │   ├── page.tsx                 # Listado de cursos
+│   │   ├── page.tsx
 │   │   └── [id]/
-│   │       ├── page.tsx             # Vista del curso
-│   │       └── equipos/page.tsx     # Gestión de equipos
-│   ├── layout.tsx                   # Layout principal con AuthProvider
-│   ├── page.tsx                     # Página principal
-│   └── globals.css                  # Estilos globales
+│   │       ├── page.tsx
+│   │       └── equipos/page.tsx
+│   ├── admin/
+│   │   ├── cursos/page.tsx
+│   │   └── proyectos/page.tsx
+│   ├── layout.tsx
+│   ├── page.tsx
+│   └── globals.css
 ├── components/
-│   ├── auth/
-│   │   ├── LoginForm.tsx            # Formulario de login
-│   │   └── RegisterForm.tsx         # Formulario de registro
-│   ├── equipos/
-│   │   ├── CreateTeamModal.tsx      # Modal de creación de equipos
-│   │   ├── EditTeamModal.tsx        # Modal de edición de equipos
-│   │   └── TeamActionsModal.tsx     # Modal de acciones de equipo
-│   └── layout/
-│       └── NavBar.tsx               # Barra de navegación adaptativa
-├── contexts/
-│   └── AuthContext.tsx              # Contexto de autenticación
-└── types/
-    └── index.ts                     # Definiciones de tipos TypeScript
+│   ├── auth/{LoginForm.tsx,RegisterForm.tsx}
+│   ├── equipos/{CreateTeamModal.tsx,EditTeamModal.tsx,TeamActionsModal.tsx}
+│   └── layout/NavBar.tsx
+├── config/api.ts
+├── contexts/AuthContext.tsx
+├── services/{auth.ts,courses.ts,projects.ts,teams.ts}
+├── types/index.ts
+└── utils/cookies.ts
+
+middleware.ts
 ```
 
-## Historias de Usuario Implementadas
+---
 
-### HU1: Crear Equipo (Estudiante)
-✅ **Implementada completamente**
-- Interface para crear equipo con nombre y selección de miembros
-- Validación de 2-3 integrantes del mismo curso
-- Prevención de duplicidad en equipos del mismo curso
-- Notificaciones a miembros invitados
-- Aparición del equipo en listado del curso
+## 👤 Usuarios de demo (para explorar flujos)
 
-### HU2: Modificar Equipo (Estudiante Creador)
-✅ **Implementada completamente**
-- Edición de nombre y miembros antes de confirmación final
-- Validaciones de reglas de negocio al agregar/quitar
-- Notificaciones a miembros afectados
-- Bloqueo de edición si quedan menos de 2 miembros
+- Administrador: `admin@udea.edu.co` — contraseña: cualquier valor (demo)
+- Estudiantes:
+  - `juan.perez@udea.edu.co`
+  - `maria.garcia@udea.edu.co`
+  - `carlos.lopez@udea.edu.co`
+  - contraseña: cualquier valor (demo)
 
-### HU3: Abandonar/Disolver Equipo (Estudiante)
-✅ **Implementada completamente**
-- Opción de "abandonar equipo" para cualquier miembro
-- Opción de "disolver equipo" solo para el creador
-- Manejo de equipos incompletos (<2 miembros)
-- Notificaciones a todos los miembros
-- Eliminación del equipo del listado activo
+---
 
-## Próximas Características
+## 🗺️ Roadmap (resumen)
 
-- [ ] Dashboard de profesor
-- [ ] Gestión de proyectos y asignaciones
-- [ ] Sistema de evaluación por pares
-- [ ] Chat interno de equipos
-- [ ] Integración con calendario académico
-- [ ] Exportación de reportes
-- [ ] API REST completa
-- [ ] Base de datos persistente
+- [x] Sprint 1: Equipos (crear/editar/abandonar/disolver) + notificaciones básicas
+- [x] Sprint 2: Autenticación/registro, dashboards por rol, cursos y proyectos (admin)
+- [ ] Sprint 3: Dashboard de profesor, asignaciones, accesibilidad AA y seguridad avanzada
 
-## Contribuir
+---
 
-1. Fork el proyecto
-2. Crea una branch para tu feature (`git checkout -b feature/NuevaFuncionalidad`)
-3. Commit tus cambios (`git commit -m 'Agregar nueva funcionalidad'`)
-4. Push a la branch (`git push origin feature/NuevaFuncionalidad`)
-5. Abre un Pull Request
+## 🤝 Contribuir
+
+1. Crea una branch: `git checkout -b feature/NuevaFuncionalidad`
+2. Commit: `git commit -m "feat: describe tu cambio"`
+3. Push: `git push origin feature/NuevaFuncionalidad`
+4. Abre un Pull Request
+
+---
+
+Si necesitas alinear endpoints o agregar nuevas HU al frontend, abre un issue describiendo los contratos esperados del backend y los flujos de UI.

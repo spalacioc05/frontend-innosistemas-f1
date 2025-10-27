@@ -2,6 +2,8 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, AuthContext as AuthContextType } from '@/types';
+import { AuthService } from '@/services/auth';
+import { setCookie, deleteCookie } from '@/utils/cookies';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -13,7 +15,7 @@ export const useAuth = () => {
   return context;
 };
 
-// Mock users para demo
+// Mock users para demo (fallback si el backend no está disponible)
 const MOCK_USERS: User[] = [
   {
     id: 'admin1',
@@ -105,20 +107,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
     
     try {
-      // Simular autenticación
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const user = MOCK_USERS.find(u => u.email === email);
-      
-      if (!user) {
-        throw new Error('Usuario no encontrado');
+      // Validación de correo institucional
+      const isInstitutional = /@udea\.edu\.co$/i.test(email);
+      if (!isInstitutional) {
+        const err = new Error('Email no válido');
+        (err as any).code = 'INVALID_EMAIL';
+        throw err;
       }
 
-      // En una aplicación real, aquí validarías la contraseña
-      // Por ahora, aceptamos cualquier contraseña para demo
-      
-      setUser(user);
-      localStorage.setItem('currentUser', JSON.stringify(user));
+      try {
+        // Intento real contra el backend
+        const resp = await AuthService.login({ email, password });
+        setUser(resp.user);
+        localStorage.setItem('currentUser', JSON.stringify(resp.user));
+        // Guardar cookies para middleware y sesión
+        setCookie('auth_token', resp.token, 1);
+        setCookie('auth_role', resp.user.role, 1);
+      } catch (apiErr) {
+        // Fallback a mock en desarrollo si el backend falla
+        const fallbackUser = MOCK_USERS.find(u => u.email === email);
+        if (!fallbackUser) {
+          const err = new Error('Credenciales incorrectas — por favor verifique');
+          (err as any).code = 'INVALID_CREDENTIALS';
+          throw err;
+        }
+        setUser(fallbackUser);
+        localStorage.setItem('currentUser', JSON.stringify(fallbackUser));
+        setCookie('auth_token', 'mock-token', 1);
+        setCookie('auth_role', fallbackUser.role, 1);
+      }
     } catch (error) {
       throw error;
     } finally {
@@ -126,9 +143,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('currentUser');
+  const logout = async () => {
+    try {
+      await AuthService.logout();
+    } finally {
+      setUser(null);
+      localStorage.removeItem('currentUser');
+      deleteCookie('auth_token');
+      deleteCookie('auth_role');
+    }
   };
 
   const value: AuthContextType = {
