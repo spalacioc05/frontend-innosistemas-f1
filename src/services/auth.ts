@@ -1,20 +1,37 @@
 import { ApiClient } from '@/config/api';
-import type { AuthResponse, LoginPayload, RegisterPayload } from '@/types';
+import type { 
+  TokenResponse, 
+  LoginRequest, 
+  CreateUserDto,
+  RefreshTokenRequest,
+  LogoutRequest
+} from '@/types';
 
 export class AuthService {
-  static async login(payload: LoginPayload): Promise<AuthResponse> {
-    return ApiClient.post<AuthResponse>('/auth/login', payload);
+  static async login(payload: LoginRequest): Promise<TokenResponse> {
+    return ApiClient.post<TokenResponse>('/auth/login', payload);
   }
 
-  static async register(payload: RegisterPayload): Promise<{ message: string }> {
-    return ApiClient.post<{ message: string }>('/auth/register', payload);
+  static async register(payload: CreateUserDto): Promise<{ message: string }> {
+    return ApiClient.post<{ message: string }>('/users/createUser', payload);
   }
 
-  static async logout(token?: string): Promise<void> {
+  static async logout(email: string): Promise<void> {
     try {
-      await ApiClient.post<void>('/auth/logout', undefined);
-    } catch {
-      // El backend puede no exponer logout; ignoramos errores para no bloquear la UI
+      const logoutPayload: LogoutRequest = { email };
+      await ApiClient.post<void>('/auth/logout', logoutPayload);
+    } catch (error) {
+      console.warn('Error al cerrar sesión:', error);
+      // Ignoramos errores para no bloquear la UI
     }
+  }
+
+  static async refreshToken(refreshToken: string): Promise<TokenResponse> {
+    const refreshPayload: RefreshTokenRequest = { refreshToken };
+    return ApiClient.post<TokenResponse>('/auth/refresh', refreshPayload);
+  }
+
+  static async getUserInfo(): Promise<any> {
+    return ApiClient.get<any>('/auth/me');
   }
 }

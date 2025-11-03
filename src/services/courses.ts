@@ -1,27 +1,24 @@
 import { ApiClient } from '@/config/api';
-
-export interface CreateCoursePayload {
-  name: string;
-  description?: string;
-}
-
-export interface CourseDTO {
-  id: string;
-  name: string;
-  description?: string;
-}
+import type { CourseDto, CreateCourseForm } from '@/types';
 
 export class CoursesService {
-  static async createCourse(payload: CreateCoursePayload): Promise<CourseDTO> {
-    // Ajusta el endpoint según el backend cuando esté disponible
-    return ApiClient.post<CourseDTO>('/course/createCourse', payload);
+  static async createCourse(name: string): Promise<CourseDto> {
+    return ApiClient.post<CourseDto>('/courses', { name });
   }
 
-  static async existsByName(name: string): Promise<{ exists: boolean }> {
-    return ApiClient.get<{ exists: boolean }>(`/course/existsByName?name=${encodeURIComponent(name)}`);
+  static async getAllCourses(): Promise<CourseDto[]> {
+    return ApiClient.get<CourseDto[]>('/courses');
   }
 
-  static async list(): Promise<CourseDTO[]> {
-    return ApiClient.get<CourseDTO[]>('/course/getAllCourses');
+  static async getCourseById(id: number): Promise<CourseDto> {
+    return ApiClient.get<CourseDto>(`/courses/${id}`);
+  }
+
+  static async updateCourse(id: number, name: string): Promise<CourseDto> {
+    return ApiClient.put<CourseDto>(`/courses/${id}`, name);
+  }
+
+  static async deleteCourse(id: number): Promise<void> {
+    return ApiClient.delete<void>(`/courses/${id}`);
   }
 }

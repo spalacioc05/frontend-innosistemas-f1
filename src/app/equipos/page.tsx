@@ -2,32 +2,25 @@
 
 import { useEffect, useState } from 'react';
 import NavBar from '@/components/layout/NavBar';
-import { Team, Student, SOFTWARE_ENGINEERING_COURSES } from '@/types';
-import { TeamsService, TeamResponse, ProjectsService, UsersService, Project, User, UpdateTeamRequest } from '@/services/teams';
+import { Team, Student, SOFTWARE_ENGINEERING_COURSES, TeamShowDto, ProjectDto, UserDto, CreateTeamForm } from '@/types';
+import { TeamsService } from '@/services/teams';
+import { ProjectsService } from '@/services/projects';
+import { UsersService } from '@/services/users';
 
-// Función para convertir TeamResponse a Team
+// Función para convertir TeamShowDto a Team
 // Nota: teamResponse.projectId y teamResponse.projectName se reciben del backend pero NO se muestran en la UI
-const mapTeamResponseToTeam = (teamResponse: TeamResponse): Team => ({
+const mapTeamResponseToTeam = (teamResponse: TeamShowDto): Team => ({
   id: teamResponse.idTeam.toString(),
   name: teamResponse.nameTeam,
   courseId: teamResponse.courseId.toString(),
   creatorId: teamResponse.students[0]?.email || '',
   projectId: teamResponse.projectId.toString(), // Incluir projectId para edición
+  createdAt: new Date(), // Fecha por defecto (el backend no proporciona esta información)
   members: teamResponse.students.map((student, idx) => ({
     id: idx.toString(),
     name: student.nameUser,
-    email: student.email,
-    role: 'student',
-    courseIds: [teamResponse.courseId.toString()],
-    skills: [],
-    currentTeams: { [teamResponse.courseId.toString()]: teamResponse.idTeam.toString() },
-    createdAt: new Date(),
-    updatedAt: new Date()
-  })),
-  status: 'active',
-  isConfirmed: true,
-  createdAt: new Date(),
-  updatedAt: new Date()
+    email: student.email
+  }))
 });
 
 export default function EquiposPage() {
@@ -36,8 +29,8 @@ export default function EquiposPage() {
   const [error, setError] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingTeam, setEditingTeam] = useState<Team | null>(null);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
+  const [projects, setProjects] = useState<ProjectDto[]>([]);
+  const [users, setUsers] = useState<UserDto[]>([]);
   const [formData, setFormData] = useState({
     nameTeam: '',
     projectId: '',
@@ -104,30 +97,17 @@ export default function EquiposPage() {
       
       if (editingTeam) {
         // Actualizar equipo existente
-        const updateData: UpdateTeamRequest = {
-          idTeam: parseInt(editingTeam.id),
+        const updateData: CreateTeamForm = {
           nameTeam: formData.nameTeam,
-          courseId: 1, // Valor por defecto
-          projectId: parseInt(formData.projectId),
-          projectName: selectedProject?.name || 'Proyecto',
-          students: selectedUsersList.map(user => ({
-            email: user.email,
-            nameUser: user.nameUser
-          }))
+          projectId: parseInt(formData.projectId)
         };
         
-        await TeamsService.updateTeam(updateData);
+        await TeamsService.updateTeam(editingTeam.id, updateData);
       } else {
         // Crear nuevo equipo
         await TeamsService.createTeam({
           nameTeam: formData.nameTeam,
-          courseId: 1, // Valor por defecto
-          projectId: parseInt(formData.projectId),
-          projectName: selectedProject?.name || 'Proyecto',
-          students: selectedUsersList.map(user => ({
-            email: user.email,
-            nameUser: user.nameUser
-          }))
+          projectId: parseInt(formData.projectId)
         });
       }
       
@@ -342,14 +322,14 @@ export default function EquiposPage() {
                         </span>
                       </div>
                       <p className="mt-1 text-sm text-gray-600">
-                        {SOFTWARE_ENGINEERING_COURSES.find(course => course.id === team.courseId)?.description || 'Descripción no disponible'}
+                        {SOFTWARE_ENGINEERING_COURSES.find(course => course.idCourse === parseInt(team.courseId))?.nameCourse || 'Descripción no disponible'}
                       </p>
                       <div className="mt-2 flex items-center space-x-4 text-sm text-gray-500">
                         <span className="flex items-center">
                           <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                           </svg>
-                          {SOFTWARE_ENGINEERING_COURSES.find(course => course.id === team.courseId)?.name || 'Curso no encontrado'}
+                          {SOFTWARE_ENGINEERING_COURSES.find(course => course.idCourse === parseInt(team.courseId))?.nameCourse || 'Curso no encontrado'}
                         </span>
                         <span className="flex items-center">
                           <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -63,27 +63,27 @@ export default function CursosPage() {
         {/* Grid de cursos */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCourses.map((course) => (
-            <div key={course.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+            <div key={course.idCourse} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                     Semestre {course.semester}
                   </span>
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    course.isActive 
+                    course.status 
                       ? 'bg-green-100 text-green-800' 
                       : 'bg-gray-100 text-gray-800'
                   }`}>
-                    {course.isActive ? 'Activo' : 'Inactivo'}
+                    {course.status ? 'Activo' : 'Inactivo'}
                   </span>
                 </div>
 
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  {course.name}
+                  {course.nameCourse}
                 </h3>
                 
                 <p className="text-gray-600 text-sm mb-4">
-                  {course.description}
+                  Curso de {course.nameCourse} - Semestre {course.semester}
                 </p>
 
                 <div className="space-y-2 text-sm text-gray-500 mb-4">
@@ -91,25 +91,25 @@ export default function CursosPage() {
                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
-                    Prof. {course.professor}
+                    Ingeniería de Software
                   </div>
                   <div className="flex items-center">
                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
-                    Equipos de {course.minTeamSize}-{course.maxTeamSize} estudiantes
+                    Equipos de desarrollo
                   </div>
                 </div>
 
                 <div className="flex space-x-2">
                   <Link
-                    href={`/cursos/${course.id}/equipos`}
+                    href={`/cursos/${course.idCourse}/equipos`}
                     className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-4 rounded-lg font-medium transition-colors"
                   >
                     Ver Equipos
                   </Link>
                   <Link
-                    href={`/cursos/${course.id}`}
+                    href={`/cursos/${course.idCourse}`}
                     className="flex-1 border border-blue-600 text-blue-600 hover:bg-blue-50 text-center py-2 px-4 rounded-lg font-medium transition-colors"
                   >
                     Detalles

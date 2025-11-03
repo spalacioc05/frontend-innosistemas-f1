@@ -1,7 +1,11 @@
+"use client";
+
 import Link from "next/link";
 import NavBar from "../components/layout/NavBar";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Home() {
+  const { user } = useAuth();
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <NavBar />
@@ -28,12 +32,21 @@ export default function Home() {
             >
               Ver Cursos
             </Link>
-            <Link
-              href="/auth/login"
-              className="border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white font-medium py-3 px-8 rounded-lg transition-colors duration-200 w-full sm:w-auto"
-            >
-              Iniciar Sesión
-            </Link>
+            {user ? (
+              <div className="border border-gray-400 text-gray-500 bg-gray-100 font-medium py-3 px-8 rounded-lg w-full sm:w-auto cursor-not-allowed flex items-center justify-center">
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Ya has iniciado sesión
+              </div>
+            ) : (
+              <Link
+                href="/auth/login"
+                className="border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white font-medium py-3 px-8 rounded-lg transition-colors duration-200 w-full sm:w-auto"
+              >
+                Iniciar Sesión
+              </Link>
+            )}
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">

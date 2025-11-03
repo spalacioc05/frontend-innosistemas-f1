@@ -1,210 +1,190 @@
-// Tipos para la gestión de equipos de desarrollo
+﻿// Tipos para el sistema Innosistemas - Adaptados al backend Java Spring Boot
 
-export interface User {
+// Tipos de autenticación
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface TokenResponse {
+  accessToken: string;
+  refreshToken: string;
+  tokenType: string;
+  expiresIn: number;
+}
+
+export interface UserInfo {
+  email: string;
+  name: string;
+  role: string;
+  permissions: Permission[];
+}
+
+export interface Permission {
+  namePermission: string;
+}
+
+export interface RefreshTokenRequest {
+  refreshToken: string;
+}
+
+export interface LogoutRequest {
+  email: string;
+}
+
+// Entidades principales
+export interface UserDto {
+  email: string;
+  nameUser: string;
+}
+
+export interface CreateUserDto {
+  email: string;
+  nameUser: string;
+  password: string;
+}
+
+export interface CourseDto {
+  idCourse: number;
+  nameCourse: string;
+}
+
+export interface TeamDto {
+  idTeam: number;
+  nameTeam: string;
+  projectId: number;
+}
+
+export interface TeamShowDto {
+  idTeam: number;
+  nameTeam: string;
+  projectId: number;
+  projectName: string;
+  courseId: number;
+  students: UserDto[];
+}
+
+export interface ProjectDto {
+  id: number;
+  name: string;
+}
+
+// Tipos para respuestas de API
+export interface ApiResponse<T> {
+  data?: T;
+  message?: string;
+  error?: string;
+  timestamp?: string;
+  status?: number;
+}
+
+export interface ApiError {
+  timestamp: string;
+  status: number;
+  error: string;
+  message: string;
+  path?: string;
+}
+
+// Tipos para formularios
+export interface CreateTeamForm {
+  nameTeam: string;
+  projectId: number;
+}
+
+export interface CreateCourseForm {
+  nameCourse: string;
+  semester: number;
+  status: boolean;
+}
+
+export interface CreateProjectForm {
+  nameProject: string;
+  descriptions: string;
+  courseId: number;
+}
+
+// Tipos para autenticación y contexto
+export interface AuthContextType {
+  user: UserInfo | null;
+  token: string | null;
+  login: (credentials: LoginRequest) => Promise<void>;
+  logout: () => void;
+  refreshToken: () => Promise<void>;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+}
+
+// Aliases para compatibilidad con el código existente
+export type AuthResponse = TokenResponse;
+export type LoginPayload = LoginRequest;
+export type RegisterPayload = CreateUserDto;
+
+// Constantes para cursos de ingeniería de software
+export const SOFTWARE_ENGINEERING_COURSES = [
+  {
+    idCourse: 1,
+    nameCourse: "Fundamentos de Programación",
+    semester: 1,
+    status: true
+  },
+  {
+    idCourse: 2,
+    nameCourse: "Estructuras de Datos",
+    semester: 2,
+    status: true
+  },
+  {
+    idCourse: 3,
+    nameCourse: "Algoritmos y Complejidad",
+    semester: 3,
+    status: true
+  },
+  {
+    idCourse: 4,
+    nameCourse: "Ingeniería de Software I",
+    semester: 4,
+    status: true
+  },
+  {
+    idCourse: 5,
+    nameCourse: "Bases de Datos",
+    semester: 4,
+    status: true
+  },
+  {
+    idCourse: 6,
+    nameCourse: "Ingeniería de Software II",
+    semester: 5,
+    status: true
+  },
+  {
+    idCourse: 7,
+    nameCourse: "Arquitectura de Software",
+    semester: 6,
+    status: true
+  },
+  {
+    idCourse: 8,
+    nameCourse: "Proyecto de Grado",
+    semester: 8,
+    status: true
+  }
+] as const;
+
+// Tipos adicionales para el frontend
+export interface Student {
   id: string;
   name: string;
   email: string;
-  avatar?: string;
-  role: 'student' | 'admin' | 'professor';
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface Student extends User {
-  role: 'student';
-  courseIds: string[]; // Un estudiante puede estar en múltiples cursos
-  skills: string[];
-  currentTeams: { [courseId: string]: string }; // courseId -> teamId mapping
-}
-
-export interface Course {
-  id: string;
-  name: string;
-  semester: number;
-  description: string;
-  professor: string;
-  maxTeamSize: number;
-  minTeamSize: number;
-  isActive: boolean;
 }
 
 export interface Team {
   id: string;
   name: string;
   courseId: string;
-  creatorId: string; // ID del estudiante que creó el equipo
+  creatorId: string;
+  projectId: string;
   members: Student[];
-  projectId?: string;
-  status: 'forming' | 'active' | 'completed' | 'incomplete';
   createdAt: Date;
-  updatedAt: Date;
-  isConfirmed: boolean; // Para la confirmación final del curso
 }
-
-export interface Project {
-  id: string;
-  title: string;
-  description: string;
-  courseId: string;
-  teamId?: string;
-  requirements: string[];
-  dueDate: Date;
-  status: 'pending' | 'in-progress' | 'completed' | 'overdue';
-  progress: number; // 0-100
-}
-
-export interface Notification {
-  id: string;
-  userId: string;
-  type: 'team_assignment' | 'team_removal' | 'team_invitation' | 'team_dissolved' | 'project_update' | 'deadline_reminder' | 'team_incomplete';
-  title: string;
-  message: string;
-  read: boolean;
-  createdAt: Date;
-  teamId?: string;
-  courseId?: string;
-  actionRequired?: boolean; // Para notificaciones que requieren acción
-}
-
-export interface TeamReport {
-  teamId: string;
-  teamName: string;
-  courseName: string;
-  memberCount: number;
-  projectProgress: number;
-  lastActivity: Date;
-  status: Team['status'];
-}
-
-// Nueva interfaz para manejar las invitaciones de equipo
-export interface TeamInvitation {
-  id: string;
-  teamId: string;
-  invitedStudentId: string;
-  invitedBy: string; // ID del estudiante que invita
-  courseId: string;
-  status: 'pending' | 'accepted' | 'declined';
-  createdAt: Date;
-  expiresAt: Date;
-}
-
-// Interface para validaciones de equipo
-export interface TeamValidation {
-  isValid: boolean;
-  errors: TeamValidationError[];
-  warnings: TeamValidationWarning[];
-}
-
-export interface TeamValidationError {
-  type: 'min_members' | 'max_members' | 'duplicate_membership' | 'different_course' | 'already_in_team';
-  message: string;
-  studentId?: string;
-}
-
-export interface TeamValidationWarning {
-  type: 'incomplete_team' | 'pending_invitations';
-  message: string;
-}
-
-// Interface para el contexto de usuario autenticado
-export interface AuthContext {
-  user: User | null;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
-  isLoading: boolean;
-}
-
-// Autenticación
-export type Role = 'student' | 'admin' | 'professor';
-
-export interface LoginPayload {
-  email: string;
-  password: string;
-}
-
-export interface AuthResponse {
-  token: string;
-  user: User;
-}
-
-export interface RegisterPayload {
-  name: string;
-  email: string;
-  password: string;
-  roleInProject: string; // Preferencia del usuario en los proyectos (p.ej., "Desarrollador", "QA")
-  courseIds: string[];   // Cursos seleccionados en los que estará matriculado
-}
-
-// Cursos de Ingeniería de Software
-export const SOFTWARE_ENGINEERING_COURSES: Course[] = [
-  {
-    id: 'is1',
-    name: 'Introducción a la Ingeniería de Software',
-    semester: 1,
-    description: 'Fundamentos y conceptos básicos de la ingeniería de software',
-    professor: 'Dr. Ana García',
-    maxTeamSize: 3,
-    minTeamSize: 2,
-    isActive: true
-  },
-  {
-    id: 'is2',
-    name: 'Programación Orientada a Objetos',
-    semester: 2,
-    description: 'Principios y práticas de programación orientada a objetos',
-    professor: 'Dr. Carlos López',
-    maxTeamSize: 3,
-    minTeamSize: 2,
-    isActive: true
-  },
-  {
-    id: 'is3',
-    name: 'Estructuras de Datos y Algoritmos',
-    semester: 3,
-    description: 'Análisis y diseño de estructuras de datos y algoritmos eficientes',
-    professor: 'Dra. María Rodríguez',
-    maxTeamSize: 3,
-    minTeamSize: 2,
-    isActive: true
-  },
-  {
-    id: 'is4',
-    name: 'Bases de Datos',
-    semester: 4,
-    description: 'Diseño, implementación y gestión de sistemas de bases de datos',
-    professor: 'Dr. Luis Martínez',
-    maxTeamSize: 3,
-    minTeamSize: 2,
-    isActive: true
-  },
-  {
-    id: 'is5',
-    name: 'Ingeniería de Requisitos',
-    semester: 5,
-    description: 'Técnicas para el análisis y especificación de requisitos de software',
-    professor: 'Dra. Elena Ruiz',
-    maxTeamSize: 3,
-    minTeamSize: 2,
-    isActive: true
-  },
-  {
-    id: 'is6',
-    name: 'Arquitectura de Software',
-    semester: 6,
-    description: 'Diseño y evaluación de arquitecturas de sistemas de software',
-    professor: 'Dr. Jorge Pérez',
-    maxTeamSize: 3,
-    minTeamSize: 2,
-    isActive: true
-  },
-  {
-    id: 'is7',
-    name: 'Proyecto de Grado',
-    semester: 7,
-    description: 'Desarrollo integral de un proyecto de software',
-    professor: 'Dr. Roberto Silva',
-    maxTeamSize: 3,
-    minTeamSize: 2,
-    isActive: true
-  }
-];

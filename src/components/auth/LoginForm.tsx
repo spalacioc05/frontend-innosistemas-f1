@@ -20,12 +20,14 @@ export default function LoginForm() {
       ...prev,
       [name]: value
     }));
-    // Limpiar error cuando el usuario empiece a escribir
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
+    // Limpiar errores cuando el usuario empiece a escribir
+    if (errors[name] || errors.general) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        delete newErrors.general; // Limpiar error general también
+        return newErrors;
+      });
     }
   };
 
@@ -34,14 +36,12 @@ export default function LoginForm() {
 
     if (!formData.email) {
       newErrors.email = 'El correo electrónico es requerido';
-    } else if (!/^[^\s@]+@udea\.edu\.co$/i.test(formData.email)) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Email no válido';
     }
 
     if (!formData.password) {
       newErrors.password = 'La contraseña es requerida';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'La contraseña debe tener al menos 6 caracteres';
     }
 
     setErrors(newErrors);
@@ -56,17 +56,35 @@ export default function LoginForm() {
     }
 
     try {
-      await login(formData.email, formData.password);
+      await login(formData);
       
       // Redireccionar después del login exitoso
       router.push('/dashboard');
       
     } catch (error) {
       console.error('Error en el login:', error);
-      const message = (error as any)?.code === 'INVALID_EMAIL'
-        ? 'Email no válido'
-        : 'Credenciales incorrectas — por favor verifique';
-      setErrors({ general: message });
+      
+      // Manejar diferentes tipos de errores
+      let errorMessage = 'Error de conexión - por favor intente nuevamente';
+      
+      if (error instanceof Error) {
+        const message = error.message.toLowerCase();
+        
+        if (message.includes('invalid credentials') || message.includes('credenciales incorrectas')) {
+          errorMessage = 'Credenciales incorrectas. Verifique su email y contraseña.';
+        } else if (message.includes('unauthorized') || message.includes('401')) {
+          errorMessage = 'Email o contraseña incorrectos.';
+        } else if (message.includes('internal server error') || message.includes('500')) {
+          errorMessage = 'Error del servidor. Intente más tarde.';
+        } else if (message.includes('network') || message.includes('fetch')) {
+          errorMessage = 'Error de conexión. Verifique su conexión a internet.';
+        } else if (error.message && error.message.length < 100) {
+          // Usar el mensaje del error si es razonablemente corto
+          errorMessage = error.message;
+        }
+      }
+      
+      setErrors({ general: errorMessage });
     }
   };
 
@@ -100,8 +118,16 @@ export default function LoginForm() {
         
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {errors.general && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-              {errors.general}
+            <div className="bg-red-50 border border-red-400 text-red-800 px-4 py-3 rounded-lg flex items-start space-x-3">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-red-800">Error de inicio de sesión</h3>
+                <p className="text-sm text-red-700 mt-1">{errors.general}</p>
+              </div>
             </div>
           )}
           

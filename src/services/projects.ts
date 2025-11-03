@@ -1,29 +1,28 @@
 import { ApiClient } from '@/config/api';
+import type { ProjectDto, CreateProjectForm, UserDto } from '@/types';
 
-export interface CreateProjectPayload {
-  name: string;
-  description: string;
-  courseId: string;
-}
-
-export interface ProjectDTO {
-  id: string;
-  name: string;
-  description: string;
-  courseId: string;
-}
-
-export class ProjectsServiceNew {
-  static async createProject(payload: CreateProjectPayload): Promise<ProjectDTO> {
-    // Ajusta el endpoint según el backend cuando esté disponible
-    return ApiClient.post<ProjectDTO>('/project/createProject', payload);
+export class ProjectsService {
+  static async createProject(payload: CreateProjectForm): Promise<ProjectDto> {
+    return ApiClient.post<ProjectDto>('/project', payload);
   }
 
-  static async existsByNameInCourse(courseId: string, name: string): Promise<{ exists: boolean }> {
-    return ApiClient.get<{ exists: boolean }>(`/project/existsByName?courseId=${encodeURIComponent(courseId)}&name=${encodeURIComponent(name)}`);
+  static async getAllProjects(): Promise<ProjectDto[]> {
+    return ApiClient.get<ProjectDto[]>('/project/getAllProjects');
   }
 
-  static async listByCourse(courseId: string): Promise<ProjectDTO[]> {
-    return ApiClient.get<ProjectDTO[]>(`/project/byCourse/${encodeURIComponent(courseId)}`);
+  static async getProjectById(id: number): Promise<ProjectDto> {
+    return ApiClient.get<ProjectDto>(`/project/${id}`);
+  }
+
+  static async updateProject(id: number, payload: CreateProjectForm): Promise<ProjectDto> {
+    return ApiClient.put<ProjectDto>(`/project/${id}`, payload);
+  }
+
+  static async deleteProject(id: number): Promise<void> {
+    return ApiClient.delete<void>(`/project/${id}`);
+  }
+
+  static async getUsersInOneTeam(projectId: number): Promise<UserDto[]> {
+    return ApiClient.get<UserDto[]>(`/project/${projectId}/users/single-team`);
   }
 }

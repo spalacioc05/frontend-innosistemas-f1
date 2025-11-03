@@ -31,13 +31,34 @@ export class ApiClient {
     };
 
     try {
+      console.log(`Making request to: ${url}`);
+      console.log(`Request config:`, config);
+      
       const response = await fetch(url, config);
       
+      console.log(`Response status: ${response.status}`);
+      console.log(`Response headers:`, response.headers);
+      
       if (!response.ok) {
-        throw new Error(`API Error: ${response.status} - ${response.statusText}`);
+        const errorText = await response.text();
+        console.error(`API Error Response Body:`, errorText);
+        
+        // Intentar parsear el mensaje de error del JSON
+        let errorMessage = `API Error: ${response.status}`;
+        try {
+          const errorJson = JSON.parse(errorText);
+          errorMessage = errorJson.message || errorMessage;
+        } catch (parseError) {
+          // Si no se puede parsear, usar el texto completo
+          errorMessage = errorText || errorMessage;
+        }
+        
+        throw new Error(errorMessage);
       }
 
-      return await response.json();
+      const responseData = await response.json();
+      console.log(`Response data:`, responseData);
+      return responseData;
     } catch (error) {
       console.error(`API request failed for ${endpoint}:`, error);
       throw error;
