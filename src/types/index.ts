@@ -38,6 +38,12 @@ export interface UserDto {
   nameUser: string;
 }
 
+export interface UserWithRoleDto {
+  email: string;
+  nameUser: string;
+  role: string;
+}
+
 export interface CreateUserDto {
   email: string;
   nameUser: string;

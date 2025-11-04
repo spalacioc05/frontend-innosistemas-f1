@@ -106,7 +106,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       console.error('Error during login:', error);
-      throw error;
+      
+      // Mejorar el manejo de errores - re-lanzar con mensaje más descriptivo
+      if (error instanceof Error) {
+        // Si el error ya tiene un mensaje útil, mantenerlo
+        if (error.message.includes('Credenciales incorrectas') || 
+            error.message.includes('conexión') ||
+            error.message.includes('servidor')) {
+          throw error;
+        }
+        // Si es un error genérico, mejorarlo
+        else {
+          throw new Error('Error al iniciar sesión. Verifique sus credenciales e intente nuevamente.');
+        }
+      } else {
+        throw new Error('Error inesperado al iniciar sesión. Intente más tarde.');
+      }
     } finally {
       setIsLoading(false);
     }

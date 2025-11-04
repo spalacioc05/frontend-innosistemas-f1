@@ -47,10 +47,52 @@ export class ApiClient {
         let errorMessage = `API Error: ${response.status}`;
         try {
           const errorJson = JSON.parse(errorText);
-          errorMessage = errorJson.message || errorMessage;
+          
+          // Si la respuesta tiene la estructura de ApiError
+          if (errorJson.message) {
+            errorMessage = errorJson.message;
+          } 
+          // Si es una respuesta simple con message
+          else if (typeof errorJson === 'object' && errorJson.message) {
+            errorMessage = errorJson.message;
+          }
+          // Manejo específico por código de estado
+          else {
+            switch (response.status) {
+              case 401:
+                errorMessage = 'Credenciales incorrectas. Verifique su email y contraseña.';
+                break;
+              case 403:
+                errorMessage = 'No tiene permisos para acceder a este recurso.';
+                break;
+              case 404:
+                errorMessage = 'Recurso no encontrado.';
+                break;
+              case 500:
+                errorMessage = 'Error interno del servidor. Intente más tarde.';
+                break;
+              default:
+                errorMessage = `Error ${response.status}: ${response.statusText}`;
+            }
+          }
         } catch (parseError) {
-          // Si no se puede parsear, usar el texto completo
-          errorMessage = errorText || errorMessage;
+          // Si no se puede parsear, usar mensaje por defecto según status code
+          switch (response.status) {
+            case 401:
+              errorMessage = 'Credenciales incorrectas. Verifique su email y contraseña.';
+              break;
+            case 403:
+              errorMessage = 'No tiene permisos para acceder a este recurso.';
+              break;
+            case 404:
+              errorMessage = 'Recurso no encontrado.';
+              break;
+            case 500:
+              errorMessage = 'Error interno del servidor. Intente más tarde.';
+              break;
+            default:
+              errorMessage = errorText || `Error ${response.status}: ${response.statusText}`;
+          }
         }
         
         throw new Error(errorMessage);
@@ -61,6 +103,13 @@ export class ApiClient {
       return responseData;
     } catch (error) {
       console.error(`API request failed for ${endpoint}:`, error);
+      
+      // Si es un error de red
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw new Error('Error de conexión. Verifique su conexión a internet.');
+      }
+      
+      // Re-lanzar el error original si ya tiene un mensaje personalizado
       throw error;
     }
   }

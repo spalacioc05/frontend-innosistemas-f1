@@ -68,19 +68,21 @@ export default function LoginForm() {
       let errorMessage = 'Error de conexión - por favor intente nuevamente';
       
       if (error instanceof Error) {
-        const message = error.message.toLowerCase();
+        const message = error.message;
         
-        if (message.includes('invalid credentials') || message.includes('credenciales incorrectas')) {
-          errorMessage = 'Credenciales incorrectas. Verifique su email y contraseña.';
-        } else if (message.includes('unauthorized') || message.includes('401')) {
-          errorMessage = 'Email o contraseña incorrectos.';
-        } else if (message.includes('internal server error') || message.includes('500')) {
-          errorMessage = 'Error del servidor. Intente más tarde.';
-        } else if (message.includes('network') || message.includes('fetch')) {
+        // El mensaje ya viene procesado desde el ApiClient, así que lo usamos directamente
+        // pero verificamos algunos casos específicos para mejorar la experiencia
+        if (message.includes('Credenciales incorrectas') || 
+            message.includes('Invalid credentials') || 
+            message.includes('incorrect')) {
+          errorMessage = 'Email o contraseña incorrectos. Verifique sus credenciales.';
+        } else if (message.includes('conexión') || message.includes('connection')) {
           errorMessage = 'Error de conexión. Verifique su conexión a internet.';
-        } else if (error.message && error.message.length < 100) {
-          // Usar el mensaje del error si es razonablemente corto
-          errorMessage = error.message;
+        } else if (message.includes('servidor') || message.includes('server')) {
+          errorMessage = 'Error del servidor. Intente más tarde.';
+        } else if (message.length > 5 && message.length < 150) {
+          // Si el mensaje es razonable, usarlo directamente
+          errorMessage = message;
         }
       }
       
