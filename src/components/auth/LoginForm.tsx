@@ -106,16 +106,6 @@ export default function LoginForm() {
               Regístrate aquí
             </Link>
           </p>
-          
-          {/* Información para demo */}
-          <div className="mt-4 p-4 bg-blue-50 rounded-md">
-            <h3 className="text-sm font-medium text-blue-800 mb-2">Usuarios de Demo:</h3>
-            <div className="text-sm text-blue-700 space-y-1">
-              <p><strong>Administrador:</strong> admin@udea.edu.co</p>
-              <p><strong>Estudiante:</strong> juan.perez@udea.edu.co</p>
-              <p><strong>Contraseña:</strong> cualquier valor (demo)</p>
-            </div>
-          </div>
         </div>
         
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
