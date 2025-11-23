@@ -7,8 +7,22 @@ export class TeamsService {
     return ApiClient.post<TeamDto>('/team', payload);
   }
 
-  static async getAllTeams(): Promise<TeamShowDto[]> {
-    return ApiClient.get<TeamShowDto[]>('/team/getAllTeam');
+  /**
+   * Obtener equipos con soporte de query params: search, courseId, status, sort
+   * status = 'formed' | 'incomplete'
+   * sort = 'course' | 'name' | 'state'
+   */
+  static async getAllTeams(params?: { search?: string; courseId?: string; status?: string; sort?: string; minSize?: number }): Promise<TeamShowDto[]> {
+    const qs = [] as string[];
+    if (params) {
+      if (params.search) qs.push(`search=${encodeURIComponent(params.search)}`);
+      if (params.courseId) qs.push(`courseId=${encodeURIComponent(params.courseId)}`);
+      if (params.status) qs.push(`status=${encodeURIComponent(params.status)}`);
+      if (params.sort) qs.push(`sort=${encodeURIComponent(params.sort)}`);
+      if (params.minSize) qs.push(`minSize=${encodeURIComponent(String(params.minSize))}`);
+    }
+    const endpoint = `/team/getAllTeam${qs.length ? `?${qs.join('&')}` : ''}`;
+    return ApiClient.get<TeamShowDto[]>(endpoint);
   }
 
   static async getTeamById(id: string): Promise<TeamDto> {

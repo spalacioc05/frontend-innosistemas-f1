@@ -25,6 +25,10 @@ const mapTeamResponseToTeam = (teamResponse: TeamShowDto): Team => ({
 
 export default function EquiposPage() {
   const [teams, setTeams] = useState<Team[]>([]);
+  const [search, setSearch] = useState('');
+  const [selectedCourse, setSelectedCourse] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -61,27 +65,26 @@ export default function EquiposPage() {
     }
   };
 
-  const loadAllTeams = async () => {
+  const loadAllTeams = async (opts?: { search?: string; courseId?: string; status?: string; sort?: string }) => {
     setLoading(true);
     setError(null);
-    
+
     try {
-      // Obtener todos los equipos
-      const teamResponses = await TeamsService.getAllTeams();
-      
-      // Log para verificar que se recibe projectId (solo para desarrollo)
-      console.log('Equipos recibidos con projectId:', teamResponses.map(team => ({
-        name: team.nameTeam,
-        projectId: team.projectId,
-        projectName: team.projectName
-      })));
-      
+      // Llamada al servicio con params (si se proporcionan)
+      const teamResponses = await TeamsService.getAllTeams({
+        search: opts?.search ?? search,
+        courseId: opts?.courseId ?? selectedCourse,
+        status: opts?.status ?? (statusFilter === 'all' ? undefined : statusFilter),
+        sort: opts?.sort ?? sortBy,
+        minSize: 3
+      });
+
       const mappedTeams = teamResponses.map(mapTeamResponseToTeam);
       setTeams(mappedTeams);
     } catch (err) {
       setError('Error al cargar los equipos. Intenta nuevamente.');
       console.error('Error loading teams:', err);
-      setTeams([]); // Fallback a array vacío
+      setTeams([]);
     } finally {
       setLoading(false);
     }
@@ -244,6 +247,60 @@ export default function EquiposPage() {
       )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Controles de búsqueda / filtros / orden */}
+        <div className="mb-6 bg-white rounded-lg p-4 shadow-sm">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <label className="text-sm font-medium text-gray-700">Buscar</label>
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => { setSearch(e.target.value); loadAllTeams({ search: e.target.value }); }}
+                placeholder="Buscar por nombre de equipo..."
+                className="mt-1 w-full px-3 py-2 border rounded-md"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">Curso</label>
+              <select
+                value={selectedCourse}
+                onChange={(e) => { setSelectedCourse(e.target.value); loadAllTeams({ courseId: e.target.value }); }}
+                className="mt-1 w-full px-3 py-2 border rounded-md"
+              >
+                <option value="">Todos los cursos</option>
+                {SOFTWARE_ENGINEERING_COURSES.map(c => (
+                  <option key={c.idCourse} value={String(c.idCourse)}>{c.nameCourse}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">Estado</label>
+              <select
+                value={statusFilter}
+                onChange={(e) => { setStatusFilter(e.target.value); loadAllTeams({ status: e.target.value === 'all' ? undefined : e.target.value }); }}
+                className="mt-1 w-full px-3 py-2 border rounded-md"
+              >
+                <option value="all">Todos</option>
+                <option value="formed">Formado</option>
+                <option value="incomplete">Incompleto</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">Ordenar</label>
+              <select
+                value={sortBy}
+                onChange={(e) => { setSortBy(e.target.value); loadAllTeams({ sort: e.target.value }); }}
+                className="mt-1 w-full px-3 py-2 border rounded-md"
+              >
+                <option value="">Sin orden</option>
+                <option value="course">Por curso</option>
+                <option value="name">Por nombre</option>
+                <option value="state">Por estado</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
         {/* Estadísticas */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-md p-6">
@@ -320,6 +377,16 @@ export default function EquiposPage() {
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                           {team.members.length} miembros
                         </span>
+                        {/* Estado visual: Incompleto / Formado */}
+                        {team.members.length < 3 ? (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            Incompleto
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            Formado
+                          </span>
+                        )}
                       </div>
                       <p className="mt-1 text-sm text-gray-600">
                         {SOFTWARE_ENGINEERING_COURSES.find(course => course.idCourse === parseInt(team.courseId))?.nameCourse || 'Descripción no disponible'}
@@ -344,7 +411,7 @@ export default function EquiposPage() {
                     </div>
                     
                     {/* Botones de acción */}
-                    <div className="ml-4 flex-shrink-0 flex space-x-2">
+                    <div className="ml-4 shrink-0 flex space-x-2">
                       <button
                         onClick={() => handleEditTeam(team)}
                         className="bg-yellow-100 hover:bg-yellow-200 text-yellow-700 px-3 py-1 rounded text-sm font-medium transition-colors flex items-center space-x-1"
