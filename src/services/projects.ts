@@ -11,15 +11,19 @@ export class ProjectsService {
   }
 
   static async getProjectById(id: number): Promise<ProjectDto> {
-    return ApiClient.get<ProjectDto>(`/project/${id}`);
+    return ApiClient.get<ProjectDto>(`/project/getProject/${id}`);
   }
 
-  static async updateProject(id: number, payload: CreateProjectForm): Promise<ProjectDto> {
-    return ApiClient.put<ProjectDto>(`/project/${id}`, payload);
+  static async updateProject(id: number, payload: CreateProjectForm): Promise<any> {
+    const updatePayload = {
+      projectId: id,
+      ...payload
+    };
+    return ApiClient.put<any>('/project/updateProject', updatePayload);
   }
 
-  static async deleteProject(id: number): Promise<void> {
-    return ApiClient.delete<void>(`/project/${id}`);
+  static async deleteProject(id: number): Promise<any> {
+    return ApiClient.delete<any>(`/project/deleteProject/${id}`);
   }
 
   static async getUsersInOneTeam(projectId: number): Promise<UserDto[]> {

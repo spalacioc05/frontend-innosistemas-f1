@@ -1,13 +1,16 @@
 export const API_CONFIG = {
-  // Por defecto usar la ruta relativa `/api` para que el frontend pueda llamar a
-  // los endpoints definidos en este mismo proyecto (mock/local). Si se define
-  // `NEXT_PUBLIC_API_URL` se usará ese valor (producción / backend real).
-  BASE_URL: process.env.NEXT_PUBLIC_API_URL || '/api',
+  // TEMPORAL: URL hardcodeada para debugging
+  BASE_URL: 'http://localhost:8080/api',
   TIMEOUT: 10000,
   HEADERS: {
     'Content-Type': 'application/json',
   },
 };
+
+// Debug: verificar configuración
+console.log('🔍 DEBUG API CONFIG:');
+console.log('- HARDCODED BASE_URL:', API_CONFIG.BASE_URL);
+console.log('- NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
 
 export class ApiClient {
   private static async request<T>(
@@ -15,6 +18,12 @@ export class ApiClient {
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${API_CONFIG.BASE_URL}${endpoint}`;
+    
+    // Debug: mostrar construcción de URL
+    console.log('🔍 BUILDING REQUEST:');
+    console.log('- API_CONFIG.BASE_URL:', API_CONFIG.BASE_URL);
+    console.log('- endpoint:', endpoint);
+    console.log('- Final URL:', url);
     
     // Adjuntar Authorization si existe cookie 'auth_token' en entorno cliente
     let authHeaders: Record<string, string> = {};
@@ -34,7 +43,9 @@ export class ApiClient {
     };
 
     try {
-      console.log(`Making request to: ${url}`);
+      console.log(`Base URL: ${API_CONFIG.BASE_URL}`);
+      console.log(`Endpoint: ${endpoint}`);
+      console.log(`Full URL: ${url}`);
       console.log(`Request config:`, config);
       
       const response = await fetch(url, config);
@@ -101,9 +112,27 @@ export class ApiClient {
         throw new Error(errorMessage);
       }
 
-      const responseData = await response.json();
-      console.log(`Response data:`, responseData);
-      return responseData;
+      // Manejar respuestas sin contenido (204 No Content, etc.)
+      if (response.status === 204 || response.headers.get('content-length') === '0') {
+        console.log(`Response: No content (${response.status})`);
+        return null as T;
+      }
+
+      // Verificar si la respuesta tiene contenido antes de parsear JSON
+      const text = await response.text();
+      if (!text || text.trim() === '') {
+        console.log(`Response: Empty body`);
+        return null as T;
+      }
+
+      try {
+        const responseData = JSON.parse(text);
+        console.log(`Response data:`, responseData);
+        return responseData;
+      } catch (parseError) {
+        console.error(`Failed to parse JSON response:`, text);
+        throw new Error(`Invalid JSON response: ${text}`);
+      }
     } catch (error) {
       console.error(`API request failed for ${endpoint}:`, error);
       

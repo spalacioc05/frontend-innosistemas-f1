@@ -15,10 +15,11 @@ export class CoursesService {
   }
 
   static async updateCourse(id: number, name: string): Promise<CourseDto> {
-    return ApiClient.put<CourseDto>(`/courses/${id}`, name);
+    return ApiClient.put<CourseDto>('/courses/update', { idCourse: id, nameCourse: name });
   }
 
   static async deleteCourse(id: number): Promise<void> {
-    return ApiClient.delete<void>(`/courses/${id}`);
+    await ApiClient.delete<void>(`/courses/${id}`);
+    // No return needed for void operations
   }
 }
